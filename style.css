@@ -1,6 +1,15 @@
 
 
 
+
+
+
+
+
+/*********
+ Gameboard
+ *********/
+
 .gameBoard {
     display: flex;
     justify-content: center;
@@ -8,7 +17,6 @@
 }
 
 .box {
-    background-color: aquamarine;
     text-align: center;
     vertical-align: middle;
     border: 2px solid black;
@@ -21,5 +29,16 @@
 }
 
 .box:hover {
-    opacity: .7;
+    background-color: rgba(5, 152, 235, .6)
+}
+
+.interface {
+    display: flex;
+    justify-content: center;
+    font-size: .8em;
+    margin: 10px;
+}
+
+input {
+    margin-left: 10px;
 }
