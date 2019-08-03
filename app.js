@@ -14,8 +14,16 @@ const gameBoard = (() => {
     };
 })();
 
+const Player = (name, symbol) => {
+    const getName = () => name;
+    const getSymbol = () => symbol;
+
+    return {getName, getSymbol}
+}
+
 const displayController = (() => {
     const board = document.querySelectorAll('.box');
+    const resetBTN = document.querySelector('.resetBTN')
     const gamemodeAI = document.getElementById('AI1');
     const gamemodeAI2 = document.getElementById('AI2');
     const gamemodePvP = document.getElementById('PvP');
@@ -25,8 +33,10 @@ const displayController = (() => {
             element.addEventListener('click', () => gameBoard.mark((element.id - 1), playermark));
             element.addEventListener('click', () => element.innerHTML = playermark);
         });
-
+       
+        resetBTN.addEventListener('click', game.reset())
     };
+    
     const getGameMode = () => {
         if (gamemodeAI.checked) return gamemodeAI.id
         if (gamemodeAI2.checked) return gamemodeAI2.id
@@ -41,8 +51,12 @@ const displayController = (() => {
     };
 })();
 
+const game = () => {
+};
+
 
 //reminders
 //playermark used for event listeners
+//game.reset event listener for reset button
 let playermark = 'x';
 let compmark = 'o';
