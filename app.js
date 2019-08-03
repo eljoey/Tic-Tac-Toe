@@ -1,7 +1,7 @@
 const gameBoard = (() => {
     const board = ['', '', '','', '', '','', '', ''];
 //change 'x' in markBoard to player.mark after player factory set up
-    const mark = (index, mark) => (checkMoveValid(index)) ? board[index] = 'x' : false;
+    const mark = (index, mark) => (checkMoveValid(index)) ? board[index] = mark : false;
     const checkMoveValid = (index) => (board[index] === '') ? true : false;
     const reset = () => {
         board.forEach((element, index) => board[index] = '');
@@ -15,17 +15,34 @@ const gameBoard = (() => {
 })();
 
 const displayController = (() => {
-    const addEvList = () => {
-        let gamePad = document.querySelectorAll('.box')
-            gamePad.forEach( function(element) {
-                element.addEventListener('click', () => gameBoard.mark(player.mark));
+    const board = document.querySelectorAll('.box');
+    const gamemodeAI = document.getElementById('AI1');
+    const gamemodeAI2 = document.getElementById('AI2');
+    const gamemodePvP = document.getElementById('PvP');
+     
+    const gameListeners = () => {
+        board.forEach( function(element) {
+            element.addEventListener('click', () => gameBoard.mark((element.id - 1), playermark));
+            element.addEventListener('click', () => element.innerHTML = playermark);
         });
+
     };
+    const getGameMode = () => {
+        if (gamemodeAI.checked) return gamemodeAI.id
+        if (gamemodeAI2.checked) return gamemodeAI2.id
+        if (gamemodePvP.checked) return gamemodePvP.id
+    }
+
 
     return {
-        addEvList,
+        gameListeners,
+        getGameMode,
+
     };
 })();
 
 
 //reminders
+//playermark used for event listeners
+let playermark = 'x';
+let compmark = 'o';
