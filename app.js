@@ -2,7 +2,6 @@
 
 const gameBoard = (() => {
     const board = ['', '', '','', '', '','', '', ''];
-//change 'x' in markBoard to player.mark after player factory set up
     const mark = (index, mark) => (checkMoveValid(index)) ? board[index] = mark : false;
     const checkMoveValid = (index) => (board[index] === '') ? true : false;
     const reset = () => {
@@ -76,15 +75,8 @@ const game = (() => {
 
     const setGameMode = () => displayController.getGameMode();
 
-    const swapCurrentPlayer = () => {
-        if(currentPlayer === playerOne) {
-            currentPlayer = playerTwo;
-            console.log(currentPlayer.name)
-        } else {
-            currentPlayer = playerOne;
-            console.log(currentPlayer.name)
-        }
-    };
+    const swapCurrentPlayer = () => 
+        (game.currentPlayer === playerOne) ? game.currentPlayer = playerTwo: game.currentPlayer = playerOne;
     
     const reset = () => {
         gameBoard.reset();
@@ -93,7 +85,6 @@ const game = (() => {
 
     return {
         setGameMode,
-        playerOne,
         swapCurrentPlayer,
         currentPlayer,
         reset,
@@ -102,7 +93,3 @@ const game = (() => {
 
 
 //reminders
-//playermark used for event listeners
-//game.reset event listener for reset button
-let playermark = 'x';
-let compmark = 'o';
