@@ -1,16 +1,16 @@
 //*Handles gameboard */
 
 const gameBoard = (() => {
-    const board = ['', '', '','', '', '','', '', ''];
-    const mark = (index, mark) => (checkMoveValid(index)) ? board[index] = mark : false;
-    const checkMoveValid = (index) => (board[index] === '') ? true : false;
+    const show = ['', '', '','', '', '','', '', ''];
+    const mark = (index, mark) => (checkMoveValid(index)) ? show[index] = mark : false;
+    const checkMoveValid = (index) => (show[index] === '') ? true : false;
     const reset = () => {
-        board.forEach((element, index) => board[index] = '');
+        show.forEach((element, index) => show[index] = '');
     };
     return {
         mark,
         checkMoveValid,
-        board,
+        show,
         reset,
     };
 })();
@@ -35,9 +35,9 @@ const displayController = (() => {
      
     const gameListeners = () => {
         resetBTN.addEventListener('click', game.reset)
-        board.forEach( function(element) {
-            element.addEventListener('click', () => gameBoard.mark((element.id - 1), game.currentPlayer.getSymbol()));
-            element.addEventListener('click', () => (element.innerHTML = game.currentPlayer.getSymbol()));
+        
+        board.forEach( function(element) {            
+            element.addEventListener('click', () => game.playTurn(element));
         });
        
         
@@ -63,7 +63,10 @@ const displayController = (() => {
     };
 })();
 
+//** Handles Game */
+
 const game = (() => {
+    let turns = 0;
     const winningParameters = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
         [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -72,8 +75,7 @@ const game = (() => {
     const playerOne = Player('You', 'O');
     const playerTwo = Player('AI', 'X');
     let currentPlayer = playerOne;
-
-    const setGameMode = () => displayController.getGameMode();
+    let gameMode = displayController.getGameMode();
 
     const swapCurrentPlayer = () => 
         (game.currentPlayer === playerOne) ? game.currentPlayer = playerTwo: game.currentPlayer = playerOne;
@@ -81,15 +83,61 @@ const game = (() => {
     const reset = () => {
         gameBoard.reset();
         displayController.reset();
+        turns = 0;
+    }
+
+    const playTurn = (element) => {
+        //Checks for valid move then marks square and swaps players
+        if(gameBoard.checkMoveValid(element.id)) {
+            element.innerHTML = game.currentPlayer.getSymbol();
+            gameBoard.mark((element.id), game.currentPlayer.getSymbol())
+            swapCurrentPlayer();
+            turns ++;
+        //Checks if theres a winner   
+            if (checkForWinner()) {
+                console.log('YOU WON')
+                game.reset();
+            } else if(turns == 9) {
+                console.log('YOU TIE!');                
+            } else {
+            }
+
+        }
+        
+    }
+
+    const checkForWinner = () => {
+        let board = gameBoard.show;
+        let playerCheck = [];
+    //Loop through gameboard to get all the indexes of 'O'  
+        for(let i = 0; i < board.length; i ++)
+            if(board[i] === 'O') {
+                playerCheck.push(i);
+            }
+    //Loop through Win parameters to see if player won
+        for(let i = 0; i < game.winningParameters.length; i ++) {
+            let checkArray = game.winningParameters[i]
+            let check = function (checkArray, playerCheck) {
+                return checkArray.every(j => playerCheck.includes(j));
+            }
+            if (check(checkArray, playerCheck)) {
+                return true
+            } 
+       }
     }
 
     return {
-        setGameMode,
         swapCurrentPlayer,
         currentPlayer,
         reset,
+        gameMode,
+        playTurn,
+        checkForWinner,
+        winningParameters,
     };
 })();
 
 
 //reminders
+//check for winners not done got players check done. finish comp check
+//Add win and tie 
