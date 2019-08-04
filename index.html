@@ -6,35 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>TicTacToe Game</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
+
 </head>
 <body>
+    <div id="endMessage">Tic Tac Toe Game</div>
     <div class="gameBoard">
         <div class="row">
-            <div class="box" id="0">T</div>
-            <div class="box" id="3">T</div>
-            <div class="box" id="6">T</div>
+            <div class="box tracking-in-expand" id="0">T</div>
+            <div class="box tracking-in-expand" id="3">T</div>
+            <div class="box tracking-in-expand" id="6">T</div>
         </div> 
         <div class="row"> 
-            <div class="box" id="1">I</div>
-            <div class="box" id="4">A</div>
-            <div class="box" id="7">O</div>
+            <div class="box tracking-in-expand" id="1">I</div>
+            <div class="box tracking-in-expand" id="4">A</div>
+            <div class="box tracking-in-expand" id="7">O</div>
         </div> 
         <div class="row"> 
-            <div class="box" id="2">C</div>
-            <div class="box" id="5">C</div>
-            <div class="box" id="8">E</div>
+            <div class="box tracking-in-expand" id="2">C</div>
+            <div class="box tracking-in-expand" id="5">C</div>
+            <div class="box tracking-in-expand" id="8">E</div>
         </div>
     </div>
     <div class="interface">
-        <input name="group1" type="radio" class="gameMode" id="AI1">A.I
-        <input name="group1" type="radio" class="gameMode" id="AI2">A.I. Impossible Mode
-        <input name="group1" type="radio" class="gameMode" id="PvP">Two Player
+        <input name="group1" type="radio" class="gameMode" id="stupidAI">A.I
+        <input name="group1" type="radio" class="gameMode" id="hardAI">A.I. Impossible Mode
+        <input name="group1" type="radio" class="gameMode" id="PvP" checked>Two Player
         <input  type="button" value="Reset" class="resetBTN">
         <input  type="button" value="Start" class="startBTN">
     </div>
-   
-   
-        <script src="app.js"></script>
+    
+    <script src="app.js"></script>
 
 </body>
 </html>

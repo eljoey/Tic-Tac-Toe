@@ -24,22 +24,25 @@ const Player = (name, symbol) => {
     return {getName, getSymbol,}
 }
 
-//** Handles display */
+//** Handles display **//
 
 const displayController = (() => {
     const board = document.querySelectorAll('.box');
     const resetBTN = document.querySelector('.resetBTN');
     const startBTN = document.querySelector('.startBTN');
-    const gamemodeAI = document.getElementById('AI1');
-    const gamemodeAI2 = document.getElementById('AI2');
+    const gamemodeAI = document.getElementById('stupidAI');
+    const gamemodeAI2 = document.getElementById('hardAI');
     const gamemodePvP = document.getElementById('PvP');
+    const endMessage = document.getElementById('endMessage')
+    
      
     const gameListeners = () => {
         resetBTN.addEventListener('click', game.reset)
         startBTN.addEventListener('click', game.start)
         
         board.forEach( function(element) {            
-            element.addEventListener('click', () => game.playTurn(element));
+            element.addEventListener('click', () => game.playTurn(element));            
+            element.addEventListener('click', () => element.setAttribute('class', 'box tracking-in-expand'));            
         });
     };
     
@@ -49,17 +52,45 @@ const displayController = (() => {
         if (gamemodePvP.checked) return gamemodePvP.id
     }
 
+    const toggleRadios = () => {
+        if(game.gameOn) {
+            gamemodeAI.disabled = true
+            gamemodeAI2.disabled = true
+            gamemodePvP.disabled = true
+        } else {
+            gamemodeAI.disabled = false
+            gamemodeAI2.disabled = false
+            gamemodePvP.disabled = false
+        }
+    }
+
     const reset = () => {
+        endMessage.innerHTML = 'Tic Tac Toe Game';
         board.forEach( function(element) {
             element.innerHTML = '';
+            element.setAttribute('class', 'box');
         });
     }
 
+    const winnerAnimations = (name) => {
+        endMessage.setAttribute('class', 'text-focus-in')
+
+        if (name == 'tie') {
+            endMessage.innerHTML = "You Tied! Try Again!";            
+        } else if (game.gameMode == 'PvP' || name == 'You') {
+            endMessage.innerHTML = name + "'s Won! Congratulations!";            
+        } else  {
+            endMessage.innerHTML = "Oh No! The A.I. Beat You! Try Again!";
+            
+        }
+    }
 
     return {
         gameListeners,
         getGameMode,
         reset,
+        winnerAnimations,
+        toggleRadios,
     };
 })();
 
@@ -68,46 +99,61 @@ const displayController = (() => {
 const game = (() => {
     let gameOn = false;
     let turns = 0;    
-    const playerOne = Player('You', 'O');
-    const playerTwo = Player('AI', 'X');
+    const playerOne = Player('O', 'O');
+    let playerTwo = Player('X', 'X');
     let currentPlayer = playerOne;
-    let gameMode = displayController.getGameMode();
+    let gameMode = '';
 
     const swapCurrentPlayer = () => 
         (game.currentPlayer === playerOne) ? game.currentPlayer = playerTwo: game.currentPlayer = playerOne;
     
     const start = () => {
         reset();
-        gameOn = true;
-        console.log(gameOn)
+        game.gameOn = true;
+        setGameMode();
+        setPlayers();
+        displayController.toggleRadios();
+    }
+
+    const setGameMode = () => {
+        game.gameMode = displayController.getGameMode();
+    }
+
+    const setPlayers = () => {
+        if (game.gameMode == 'PvP') {
+            game.playerTwo = Player('X', 'X')
+        } else {
+            game.playerTwo = Player('AI', 'X')
+        }
     }
 
     const reset = () => {
         gameBoard.reset();
         displayController.reset();
         turns = 0;
-        gameOn = false;
+        game.gameOn = false;
+        displayController.toggleRadios();
+        game.currentPlayer = playerOne;
     }
 
     const playTurn = (element) => {
-        if(!gameOn) return;
+        if(!game.gameOn) return;
 
         //Checks for valid move then marks square and swaps players
         if(gameBoard.checkMoveValid(element.id)) {
             element.innerHTML = game.currentPlayer.getSymbol();
             gameBoard.mark((element.id), game.currentPlayer.getSymbol())            
             turns ++;
-        //Checks if theres a winner   
-            if (checkForWinner()) {
-                console.log('YOU WON')
-            } else if(turns == 9) {
-                console.log('YOU TIE!');                
-            } else {
-        //will need computer move here
-            }
             swapCurrentPlayer();
-        }
-        
+        //Checks if theres a winner   
+            if (checkForWinner() || turns == 9) {
+                swapCurrentPlayer();
+                congratulateWinner();
+        //Checks if its AI's turn then goes if it is
+            } else if ( (game.gameMode == 'hardAI' ||game.gameMode == 'stupidAI') && game.currentPlayer == playerTwo) {
+                computer.move(game.gameMode);
+            }
+        }        
     }
 
     const checkForWinner = () => {
@@ -140,19 +186,57 @@ const game = (() => {
        }
     }
 
+    const congratulateWinner = () => {
+        game.gameOn = false;
+        if (checkForWinner()) {
+            displayController.winnerAnimations(game.currentPlayer.getName())            
+        } else {
+            displayController.winnerAnimations('tie')
+        }
+    }
+
+
+
     return {
         swapCurrentPlayer,
         currentPlayer,
         reset,
         gameMode,
         playTurn,
-        checkForWinner,
         start,
+        gameOn,
     };
+})();
+
+
+const computer = (() => {
+    const stupidAI = () =>  {
+        for(let i = 0; i < 100; i++) {
+            let randomIndex = Math.floor(Math.random()*9);
+            let randomSpot = document.getElementById(randomIndex);   
+
+            if(gameBoard.checkMoveValid(randomIndex)) {
+                game.playTurn(randomSpot);
+                randomSpot.click();
+                break;
+            }
+        }
+    }
+
+    const move = (mode) => {
+        if(mode === 'stupidAI') {
+            stupidAI()
+        } 
+    }
+
+    return {
+        stupidAI,
+        move,
+    }
+
 })();
 
 displayController.gameListeners();
 
 //reminders
-//Add win and tie 
-//add computer move ability
+//Add hardmode AI
