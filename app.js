@@ -66,6 +66,7 @@ const displayController = (() => {
 
     const reset = () => {
         endMessage.innerHTML = 'Tic Tac Toe Game';
+        endMessage.setAttribute('class', '')
         board.forEach( function(element) {
             element.innerHTML = '';
             element.setAttribute('class', 'box');
@@ -73,12 +74,14 @@ const displayController = (() => {
     }
 
     const winnerAnimations = (name) => {
-        endMessage.setAttribute('class', 'text-focus-in')
+        endMessage.setAttribute('class', 'text-focus-in');
 
         if (name == 'tie') {
             endMessage.innerHTML = "You Tied! Try Again!";            
-        } else if (game.gameMode == 'PvP' || name == 'You') {
+        } else if (game.gameMode == 'PvP') {
             endMessage.innerHTML = name + "'s Won! Congratulations!";            
+        } else if (name == 'O') {
+            endMessage.innerHTML = "You Won! Congratulations!"
         } else  {
             endMessage.innerHTML = "Oh No! The A.I. Beat You! Try Again!";
             
@@ -100,7 +103,7 @@ const game = (() => {
     let gameOn = false;
     let turns = 0;    
     const playerOne = Player('O', 'O');
-    let playerTwo = Player('X', 'X');
+    const playerTwo = Player('X', 'X');
     let currentPlayer = playerOne;
     let gameMode = '';
 
