@@ -1,12 +1,12 @@
 //*Handles gameboard */
 
 const gameBoard = (() => {
-    const show = ['', '', '','', '', '','', '', ''];
-    let copy = (arr) => [...show];
+    const show = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let copy = () => [...show];
     const mark = (index, mark) => (checkMoveValid(index)) ? show[index] = mark : false;
-    const checkMoveValid = (index) => (show[index] === '') ? true : false;
+    const checkMoveValid = (index) => ((typeof show[index] === 'number')) ? true : false;
     const reset = () => {
-        show.forEach((element, index) => show[index] = '');
+        show.forEach((element, index) => show[index] = index);
     };
     return {
         mark,
@@ -35,8 +35,7 @@ const displayController = (() => {
     const gamemodeAI = document.getElementById('stupidAI');
     const gamemodeAI2 = document.getElementById('hardAI');
     const gamemodePvP = document.getElementById('PvP');
-    const endMessage = document.getElementById('endMessage')
-    
+    const endMessage = document.getElementById('endMessage')    
      
     const gameListeners = () => {
         resetBTN.addEventListener('click', game.reset)
@@ -85,8 +84,7 @@ const displayController = (() => {
         } else if (name == 'O') {
             endMessage.innerHTML = "You Won! Congratulations!"
         } else  {
-            endMessage.innerHTML = "Oh No! The A.I. Beat You! Try Again!";
-            
+            endMessage.innerHTML = "Oh No! The A.I. Beat You! Try Again!";            
         }
     }
 
@@ -99,7 +97,7 @@ const displayController = (() => {
     };
 })();
 
-//** Handles Game */
+//** Handles Game *//
 
 const game = (() => {
     let gameOn = false;
@@ -201,18 +199,16 @@ const game = (() => {
     }
 
     return {
-        swapCurrentPlayer,
         checkForWinner,
         currentPlayer,
         reset,
         gameMode,
         playTurn,
         start,
-        gameOn,
     };
 })();
 
-
+//** Handles Computer picks **//
 const computer = (() => {
     const stupidAI = () =>  {
         for(let i = 0; i < 100; i++) {
@@ -231,14 +227,11 @@ const computer = (() => {
         let emptySpotIndex = [];
         emptySpotIndex = newBoard.filter(s => typeof s === 'number');
         
-        // for(let i = 0; i < newBoard.length; i++) 
-        //     if (newBoard[i] == '') {
-        //         emptySpotIndex.push(i)
-        //     }
-    //If HumanPlayer Wins    
+        
+    //Check if HumanPlayer Wins    
         if ( (game.checkForWinner(newBoard)) && player === 'O' ) {
             return {score: -10};
-    //If AI Wins 
+    //Check if AI Wins 
         } else if ( (game.checkForWinner(newBoard)) && player === 'X' ){
             return {score: 10}
         } else if (emptySpotIndex.length === 0) {
@@ -248,15 +241,14 @@ const computer = (() => {
         let moves = [];
         for (let i = 0; i < emptySpotIndex.length; i++) {
             let move = {};
-            move.index = newBoard[emptySpotIndex[i]];
-                                            
+            move.index = newBoard[emptySpotIndex[i]];                                            
             newBoard[emptySpotIndex[i]] = player;
 
             if (player === 'X'){
-                let result = computer.minimax(newBoard, 'O');
+                let result = minimax(newBoard, 'O');
                 move.score = result.score;
             } else {
-                let result = computer.minimax(newBoard, 'X')
+                let result = minimax(newBoard, 'X')
                 move.score = result.score;
             }
 
@@ -283,43 +275,22 @@ const computer = (() => {
                 }
             }
         }
-
-        return moves[bestMove];
         
-
-
-
+        return moves[bestMove];
     } 
 
     const move = (mode) => {
         if(mode === 'stupidAI') stupidAI();
-        if(mode === 'hardAI') {
-            let newBoard = gameBoard.copy();
-            for(let i = 0; i < newBoard.length; i++) {
-                if (newBoard[i] == '') {
-                    newBoard[i] = i;
-                }
-            }
-            
-            
-            let z = computer.minimax(newBoard, 'X').index;
-            let randomSpot = document.getElementById(z); 
+        if(mode === 'hardAI') {  
+            let bestMove = minimax(gameBoard.copy(), 'X').index;
+            let randomSpot = document.getElementById(bestMove); 
             game.playTurn(randomSpot);
             randomSpot.click();
-        } 
-        
+        }         
     }
-
-    
-
     return {
         move,
-        minimax,
     }
-
 })();
 
 displayController.gameListeners();
-
-//reminders
-//Add hardmode AI
