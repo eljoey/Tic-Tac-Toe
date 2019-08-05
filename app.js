@@ -2,6 +2,7 @@
 
 const gameBoard = (() => {
     const show = ['', '', '','', '', '','', '', ''];
+    let copy = (arr) => [...show];
     const mark = (index, mark) => (checkMoveValid(index)) ? show[index] = mark : false;
     const checkMoveValid = (index) => (show[index] === '') ? true : false;
     const reset = () => {
@@ -12,6 +13,7 @@ const gameBoard = (() => {
         checkMoveValid,
         show,
         reset,
+        copy,
     };
 })();
 
@@ -79,7 +81,7 @@ const displayController = (() => {
         if (name == 'tie') {
             endMessage.innerHTML = "You Tied! Try Again!";            
         } else if (game.gameMode == 'PvP') {
-            endMessage.innerHTML = name + "'s Won! Congratulations!";            
+            endMessage.innerHTML = "'" + name + "' Won! Congratulations!";            
         } else if (name == 'O') {
             endMessage.innerHTML = "You Won! Congratulations!"
         } else  {
@@ -149,7 +151,7 @@ const game = (() => {
             turns ++;
             swapCurrentPlayer();
         //Checks if theres a winner   
-            if (checkForWinner() || turns == 9) {
+            if (checkForWinner(gameBoard.show) || turns == 9) {
                 swapCurrentPlayer();
                 congratulateWinner();
         //Checks if its AI's turn then goes if it is
@@ -159,8 +161,8 @@ const game = (() => {
         }        
     }
 
-    const checkForWinner = () => {
-        let board = gameBoard.show;
+    const checkForWinner = (gameBoard) => {
+        let board = gameBoard;
         let playerPicks = [];
         let computerPicks = [];
         const winningParameters = [
@@ -191,17 +193,16 @@ const game = (() => {
 
     const congratulateWinner = () => {
         game.gameOn = false;
-        if (checkForWinner()) {
+        if (checkForWinner(gameBoard.show)) {
             displayController.winnerAnimations(game.currentPlayer.getName())            
         } else {
             displayController.winnerAnimations('tie')
         }
     }
 
-
-
     return {
         swapCurrentPlayer,
+        checkForWinner,
         currentPlayer,
         reset,
         gameMode,
@@ -226,15 +227,94 @@ const computer = (() => {
         }
     }
 
+    const minimax = (newBoard, player) => {
+        let emptySpotIndex = [];
+        emptySpotIndex = newBoard.filter(s => typeof s === 'number');
+        
+        // for(let i = 0; i < newBoard.length; i++) 
+        //     if (newBoard[i] == '') {
+        //         emptySpotIndex.push(i)
+        //     }
+    //If HumanPlayer Wins    
+        if ( (game.checkForWinner(newBoard)) && player === 'O' ) {
+            return {score: -10};
+    //If AI Wins 
+        } else if ( (game.checkForWinner(newBoard)) && player === 'X' ){
+            return {score: 10}
+        } else if (emptySpotIndex.length === 0) {
+            return {score: 0}
+        }
+    
+        let moves = [];
+        for (let i = 0; i < emptySpotIndex.length; i++) {
+            let move = {};
+            move.index = newBoard[emptySpotIndex[i]];
+                                            
+            newBoard[emptySpotIndex[i]] = player;
+
+            if (player === 'X'){
+                let result = computer.minimax(newBoard, 'O');
+                move.score = result.score;
+            } else {
+                let result = computer.minimax(newBoard, 'X')
+                move.score = result.score;
+            }
+
+            newBoard[emptySpotIndex[i]] = move.index;
+            moves.push(move);
+        }
+
+        let bestMove;
+        if (player === 'X') {
+            let bestScore = 10000;
+
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].score < bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        } else  {
+            let bestScore = -10000;
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].score > bestScore) {
+                    bestScore = moves[i].score;
+                    bestMove = i;
+                }
+            }
+        }
+
+        return moves[bestMove];
+        
+
+
+
+    } 
+
     const move = (mode) => {
-        if(mode === 'stupidAI') {
-            stupidAI()
+        if(mode === 'stupidAI') stupidAI();
+        if(mode === 'hardAI') {
+            let newBoard = gameBoard.copy();
+            for(let i = 0; i < newBoard.length; i++) {
+                if (newBoard[i] == '') {
+                    newBoard[i] = i;
+                }
+            }
+            
+            
+            let z = computer.minimax(newBoard, 'X').index;
+            let randomSpot = document.getElementById(z); 
+            game.playTurn(randomSpot);
+            randomSpot.click();
         } 
+        
     }
 
+    
+
     return {
-        stupidAI,
         move,
+        minimax,
     }
 
 })();

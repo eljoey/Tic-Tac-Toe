@@ -67,8 +67,8 @@ input {
 	        animation: tracking-in-expand 0.3s linear 0.1s both;
 }
 .text-focus-in {
-	-webkit-animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
-	        animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+	-webkit-animation: text-focus-in .5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+	        animation: text-focus-in .5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 }
 
 /* ----------------------------------------------
